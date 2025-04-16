@@ -11,7 +11,4 @@ This Ansible role applies security updates to both **Debian-based** (e.g., Ubunt
 - Gathers update details and generates a summary log using a template.
 - Notifies handlers to reboot if required.
 
-## 📁 Role Structure
-
-This role assumes the following structure:
 
