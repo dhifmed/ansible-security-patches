@@ -1,0 +1,9 @@
+---
+# vars file for apply-security-patches
+debian_upgrade_tool: unattended-upgrades
+debian_upgrade_command: "unattended-upgrade -d"
+redhat_security_plugin: sl
+security_update_target: "*"
+security_log: /home/med/secure.log
+backup_dir: /home/med/backups/
+log_template_dest: "/tmp/{{ ansible_hostname }}_security_updates.log"

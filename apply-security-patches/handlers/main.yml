@@ -1,0 +1,12 @@
+---
+# handlers file for apply-security-patches
+- name: Restart unattended-upgrades service
+  service:
+        name: unattended-upgrades
+        state: restarted
+
+- name: Reboot if required
+  reboot:
+        msg: "Rebooting system after security updates"
+        pre_reboot_delay: 10
+        post_reboot_delay: 30

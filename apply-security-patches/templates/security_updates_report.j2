@@ -1,0 +1,13 @@
+Security Updates Report for {{ ansible_hostname }}
+==============================================
+
+{% if security_updates | length > 0 %}
+The following security updates are available/applied:
+
+{% for update in security_updates %}
+- {{ update }}
+{% endfor %}
+
+{% else %}
+No security updates available or applied.
+{% endif %}

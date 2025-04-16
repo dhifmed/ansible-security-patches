@@ -1,0 +1,59 @@
+---
+# tasks file for apply-security-patches
+
+- name: Update APT cache (Ubuntu/Debian)
+  apt:
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install unattended-upgrades (Ubuntu/Debian)
+  apt:
+    name: "{{debian_upgrade_tool}}"
+    state: present
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Run unattended-upgrade for security patches (Ubuntu/Debian)
+  shell: "{{ debian_uprade_command }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install yum-plugin-security (RHEL/CentOS)
+  yum:
+    name: "{{ redhat_security_plugin }}"
+    state: present
+  register: security_updates_redhat_plugin
+  when: 
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int < 8
+  notify: Reboot if required
+
+- name: Apply only security updates (RHEL/CentOS)
+  yum:
+    name: "{{ security_update_target }}"
+    state: latest
+    security: yes
+  when: ansible_facts['os_family'] == 'Debian'
+  notify: Reboot if required
+
+- name: Backup security log file
+  copy:
+    src: "{{ security_log }}"
+    dest: "{{ backup_dir }}{{ ansible_hostname }}_security_log_backup.log"
+    backup: yes
+    mode: '0644'
+  register: security_updates_redhat_copy
+  when: ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Debian'
+
+- name: Set some facts
+  set_fact:
+    security_updates: 
+      - "Security updates : {{ security_updates_redhat_plugin }}"
+      - "Security log backed up: {{ security_updates_redhat_copy.dest }}"
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Generate security update log file
+  template:
+    src: security_updates_report.j2
+    dest: "{{ log_template_dest }}"
+    mode: '0644'
+  when: ansible_facts['os_family'] == 'RedHat' 
+
