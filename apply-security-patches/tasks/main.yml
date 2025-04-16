@@ -31,7 +31,8 @@
     name: "{{ security_update_target }}"
     state: latest
     security: yes
-  when: ansible_facts['os_family'] == 'Debian'
+  register: security_updates_redhat
+  when: ansible_facts['os_family'] == 'RHEL/CentOS'
   notify: Reboot if required
 
 - name: Backup security log file
@@ -46,7 +47,8 @@
 - name: Set some facts
   set_fact:
     security_updates: 
-      - "Security updates : {{ security_updates_redhat_plugin }}"
+      - "Security plugin : {{ security_updates_redhat_plugin }}"
+      - "Security updates : {{ security_updates_redhat }}"
       - "Security log backed up: {{ security_updates_redhat_copy.dest }}"
   when: ansible_facts['os_family'] == 'RedHat'
 
